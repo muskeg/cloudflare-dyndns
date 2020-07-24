@@ -20,7 +20,7 @@ import requests
 
 
 # read configuration file
-config_file_name = "cloudflare.config"
+config_file_name = sys.argv[1] or "cloudflare.config"
 config = RawConfigParser()
 config.read(config_file_name)
 

@@ -28,22 +28,21 @@ import requests
 
 
 # read configuration file
-config_file_name = "cloudflare.config"
+config_file_name = sys.argv[1] or "cloudflare.config"
 config = RawConfigParser()
 config.read(config_file_name)
 
 # Parse parameters
 # Cloudflare
-try:
-    zone_id = config.get("cloudflare", "zone_id")
-    email = config.get("cloudflare", "email")
-    token = config.get("cloudflare", "global_token")
+zone_id = config.get("cloudflare", "zone_id")
+email = config.get("cloudflare", "email")
+token = config.get("cloudflare", "global_token")
 
 # Record parameters
 record_id = config.get("record", "record_id")
 record_name = config.get("record", "record_name")
 proxied = config.getboolean("record", "proxied")
-ttl  = config.getboolean("record", "ttl")
+ttl  = config.get("record", "ttl")
 # Simple request to get IP
 ip = requests.get('https://api.ipify.org').text
 
@@ -60,10 +59,12 @@ data = {
     'ttl': ttl
 }
 
-# Get result for logging
+# Get and print result for logging
 data_json = json.dumps(data)
+
 r = requests.put(cloudflare + api, data=data_json, headers=headers)
 result = json.loads(r.content)
 
-print("Updating  {record_name} with ip: {ip} (result: {succes})".format(record_name = result['result']['name'], ip = result['result']['content'], success = str(result['success']))
+print("Updating  {record_name} with ip: {ip} (result: {success})".format(record_name = result['result']['name'], ip = result['result']['content'], success = str(result['success'])))
+
 
